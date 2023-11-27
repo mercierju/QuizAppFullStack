@@ -2,20 +2,24 @@ version: '3.3'
 
 services:
   front:
-    image: nginx
+    build:
+      context: ./front
     volumes:
       - ./front:/usr/share/nginx/html
     ports:
-      - "80:80"
+      - "3000:80"
     depends_on:
       - back
 
   back:
     build:
-      context: .
-      dockerfile: Dockerfile_back
+      context: ./back
+    volumes:
+      - ./back:/app
     ports:
       - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/quiz
     depends_on:
       - db
 

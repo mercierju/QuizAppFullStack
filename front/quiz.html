@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Quiz App - Quiz</title>
+
+    <link rel="stylesheet" href="global.css" type="text/css" />
+
+    <script
+      src="https://code.jquery.com/jquery-3.6.1.min.js"
+      integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <nav id="navbar"></nav>
+    
+    <h2>Quiz</h2>
+
+    <div id="question-container"></div>
+    <ul id="choices-list"></ul>
+
+    <button id="submit-button" class="button">Valider mes reponses</button>
+
+    <script src="quiz.js"></script>
+    <script src="clerk-auth.js" defer></script>
+    <script>
+      $(document).ready(function () {
+        $("#navbar").load("navbar.html");
+      });
+    </script>
+  </body>
+</html>

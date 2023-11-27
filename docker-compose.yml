@@ -1,0 +1,27 @@
+version: '3.3'
+
+services:
+  front:
+    image: nginx
+    volumes:
+      - ./front:/usr/share/nginx/html
+    ports:
+      - "80:80"
+    depends_on:
+      - back
+
+  back:
+    build:
+      context: .
+      dockerfile: Dockerfile_back
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: quiz
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres

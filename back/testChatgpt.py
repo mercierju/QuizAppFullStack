@@ -8,10 +8,10 @@ from database import engine, SessionLocal
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 import openai
-import random
+import json
 
 # Configurez votre clé API OpenAI
-openai.api_key = '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'
+client = openai.OpenAI(api_key='key')
 
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
@@ -40,59 +40,42 @@ def get_db():
     finally:
         db.close()
 
-
 db_dependency = Annotated[Session, Depends(get_db)]
 
+def generate_question_and_choices():
 
-
-# Fonction pour générer une question et des choix de réponse avec GPT-3
-def generate_question_and_choices(theme):
-    prompt = f"Generate a question about {theme}"
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt,
-        max_tokens=150
+    prompt = [{'role': 'user', 'content' : "Je veux un résultat comme celui-ci mais pour plusieurs questions au format json : {'theme': 'API', 'question_text': 'Qu'est-ce que signifie l'acronyme API?', 'choices': [ {'choice_text': 'a) Application Programming Interface', 'is_correct': true}, {'choice_text': 'b) Advanced Programming Interface', 'is_correct': false}, {'choice_text': 'c) Automated Processing Interface', 'is_correct': false}, {'choice_text': 'd) Application Process Integration', 'is_correct': false} ] }, Génère une question pour chacun de ces thèmes ('API','Docker') avec pour chaque question 4 choix possibles et une valeur True ou False en fonction de si le choix est le bon. Je veux que tout soit en français. Répond juste avec le json sans autre texte pour que je puisse exploiter directement ta réponse comme un json."}]
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=prompt
     )
-    question_text = response.choices[0].text.strip()
-
-    # Génération de 4 choix de réponse avec un correct et trois incorrects
-    choices = [generate_choice(theme) for _ in range(4)]
-    correct_choice = random.choice(choices)
-    return question_text, choices, correct_choice
-
-def generate_choice(theme):
-    prompt = f"Generate a choice about {theme}"
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt,
-        max_tokens=50
-    )
-    return response.choices[0].text.strip()
+    return json.loads(response.choices[0].message.content)
 
 # Remplissage de la base de données
 def fill_database():
     session = SessionLocal()
+    data = generate_question_and_choices()
+    position = 0
 
-    themes = ["Docker", "API"]
-    i = 0
-    for theme in themes:
-        
-        question_text, choices, correct_choice = generate_question_and_choices(theme)
-
-        # Enregistrement de la question dans la base de données
-        question = models.Questions(question_text=question_text, position=i)
+    # Parcours du dictionnaire et ajout à la base de données
+    for question_data in data["questions"]:
+        # Ajoutez la question à la base de données
+        question = models.Questions(question_text=question_data["question_text"], position=position)
         session.add(question)
-        session.commit()
+        session.flush()  # Pour récupérer l'ID de la question
+        position+=1
 
-        # Enregistrement des choix dans la base de données
-        for choice_text in choices:
-            is_correct = (choice_text == correct_choice)
-            choice = models.Choices(choice_text=choice_text, is_correct=is_correct, question_id=question.id)
+        # Ajoutez les choix à la base de données
+        for choice_data in question_data["choices"]:
+            choice = models.Choices(
+                choice_text=choice_data["choice_text"],
+                is_correct=choice_data["is_correct"],
+                question_id=question.id
+            )
             session.add(choice)
-            session.commit()
-        i+=1
 
-
+    # Committez les changements à la base de données
+    session.commit()
 
 def is_table_empty():
     session = SessionLocal()

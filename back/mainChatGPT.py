@@ -44,12 +44,20 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 def generate_question_and_choices():
 
-    prompt = [{'role': 'user', 'content' : "Je veux un résultat comme celui-ci mais pour plusieurs questions au format json : {'theme': 'API', 'question_text': 'Qu'est-ce que signifie l'acronyme API?', 'choices': [ {'choice_text': 'a) Application Programming Interface', 'is_correct': true}, {'choice_text': 'b) Advanced Programming Interface', 'is_correct': false}, {'choice_text': 'c) Automated Processing Interface', 'is_correct': false}, {'choice_text': 'd) Application Process Integration', 'is_correct': false} ] }, Génère une question pour chacun de ces thèmes ('API','Docker') avec pour chaque question 4 choix possibles et une valeur True ou False en fonction de si le choix est le bon. Je veux que tout soit en français. Répond juste avec le json sans autre texte pour que je puisse exploiter directement ta réponse comme un json."}]
+    prompt = [{'role': 'user', 'content' : "Je veux un résultat comme celui-ci mais pour plusieurs questions au format json : 'questions' : [{'theme': 'API', 'question_text': 'Qu'est-ce que signifie l'acronyme API?', 'choices': [ {'choice_text': 'a) Application Programming Interface', 'is_correct': true}, {'choice_text': 'b) Advanced Programming Interface', 'is_correct': false}, {'choice_text': 'c) Automated Processing Interface', 'is_correct': false}, {'choice_text': 'd) Application Process Integration', 'is_correct': false} ] }], Génère une question pour chacun de ces thèmes ('API','Docker', 'HTML') avec pour chaque question 4 choix possibles et une valeur True ou False en fonction de si le choix est le bon. Je veux que tout soit en français. Répond juste avec le json sans aucun texte."}]
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=prompt
     )
-    return json.loads(response.choices[0].message.content)
+    out = response.choices[0].message.content
+    print(response.choices[0].message.content)
+    index_accolade = out.find('{')
+
+    if index_accolade != -1:
+        reponse = out[index_accolade:]
+
+
+    return json.loads(reponse)
 
 # Remplissage de la base de données
 def fill_database():
@@ -76,6 +84,9 @@ def fill_database():
 
     # Committez les changements à la base de données
     session.commit()
+    u0 = models.Users(username = "mercierj", clerk_id = "user_2YX6QAdQGXXLSNRngvgcoBtZIjX", best_score = 2)    
+    session.add(u0)
+    session.commit()
 
 def is_table_empty():
     session = SessionLocal()
@@ -89,6 +100,7 @@ def is_table_empty():
 async def startup_event():
     if is_table_empty():
         fill_database()  
+        
     else:
         print("La table n'est pas vide au démarrage.")
 

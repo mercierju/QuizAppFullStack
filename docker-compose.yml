@@ -19,7 +19,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      #DATABASE_URL: postgresql://postgres:postgres@localhost:5432/quiz
       DATABASE_URL: postgresql://postgres:postgres@db:5432/quiz
     depends_on:
       - db

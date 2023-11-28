@@ -119,7 +119,11 @@ async def startup_event():
         db.add(r41)
         db.add(r42)
         db.add(r43)
-        db.commit()       
+        db.commit()   
+
+        u0 = models.Users(username = "mercierj", clerk_id = "user_2YX6QAdQGXXLSNRngvgcoBtZIjX", best_score = 4)    
+        db.add(u0)
+        db.commit()
     else:
         print("La table n'est pas vide au démarrage.")
 
@@ -176,7 +180,7 @@ async def add_participation(db: db_dependency, request: Request):
         user_record.best_score = score
         db.commit()
     # Enregistrez la participation du joueur dans la base de données
-    participation = models.Participation(score=score, clerk_id = user_id)
+    participation = models.Participation(score=score, clerk_id = user_id )
     db.add(participation)
     db.commit()
     db.refresh(participation)

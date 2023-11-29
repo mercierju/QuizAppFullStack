@@ -7,3 +7,4 @@ uvicorn
 pydantic
 psycopg2
 openai
+python-dotenv

@@ -9,9 +9,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 import openai
 import json
+from dotenv import load_dotenv
+import os
 
-# Configurez votre clé API OpenAI
-client = openai.OpenAI(api_key='key')
+load_dotenv()
+openai_key = os.getenv("OPENAI_API_KEY")
+client = openai.OpenAI(api_key=openai_key)
 
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
@@ -42,51 +45,88 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
-def generate_question_and_choices():
 
-    prompt = [{'role': 'user', 'content' : "Je veux un résultat comme celui-ci mais pour plusieurs questions au format json : 'questions' : [{'theme': 'API', 'question_text': 'Qu'est-ce que signifie l'acronyme API?', 'choices': [ {'choice_text': 'a) Application Programming Interface', 'is_correct': true}, {'choice_text': 'b) Advanced Programming Interface', 'is_correct': false}, {'choice_text': 'c) Automated Processing Interface', 'is_correct': false}, {'choice_text': 'd) Application Process Integration', 'is_correct': false} ] }], Génère une question pour chacun de ces thèmes ('API','Docker', 'HTML') avec pour chaque question 4 choix possibles et une valeur True ou False en fonction de si le choix est le bon. Je veux que tout soit en français. Répond juste avec le json sans aucun texte."}]
+
+def generate_question_and_choices():
+    prompt = [{'role': 'user', 'content' : "Je veux un résultat comme celui-ci mais pour plusieurs questions au format json : 'questions' : [{'theme': 'API', 'question_text': 'Qu'est-ce que signifie l'acronyme API?', 'choices': [ {'choice_text': 'a) Application Programming Interface', 'is_correct': true}, {'choice_text': 'b) Advanced Programming Interface', 'is_correct': false}, {'choice_text': 'c) Automated Processing Interface', 'is_correct': false}, {'choice_text': 'd) Application Process Integration', 'is_correct': false} ] }], Génère une question pour chacun de ces thèmes ('API','Docker', 'HTML') avec pour chaque question 4 choix possibles et une valeur True ou False en fonction de si le choix est le bon, je veux la réponse true placée au hasard. Je veux que tout soit en français. Répond juste avec le json sans aucun texte."}]
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=prompt
-    )
+        messages=prompt)
     out = response.choices[0].message.content
     print(response.choices[0].message.content)
     index_accolade = out.find('{')
-
     if index_accolade != -1:
         reponse = out[index_accolade:]
-
-
     return json.loads(reponse)
 
+
 # Remplissage de la base de données
-def fill_database():
-    session = SessionLocal()
+def fill_database_chatgpt():
+    db = SessionLocal()
     data = generate_question_and_choices()
     position = 0
-
-    # Parcours du dictionnaire et ajout à la base de données
     for question_data in data["questions"]:
-        # Ajoutez la question à la base de données
         question = models.Questions(question_text=question_data["question_text"], position=position)
-        session.add(question)
-        session.flush()  # Pour récupérer l'ID de la question
+        db.add(question)
+        db.flush() 
         position+=1
-
-        # Ajoutez les choix à la base de données
         for choice_data in question_data["choices"]:
             choice = models.Choices(
                 choice_text=choice_data["choice_text"],
                 is_correct=choice_data["is_correct"],
-                question_id=question.id
-            )
-            session.add(choice)
-
-    # Committez les changements à la base de données
-    session.commit()
+                question_id=question.id)
+            db.add(choice)
+    db.commit()
     u0 = models.Users(username = "mercierj", clerk_id = "user_2YX6QAdQGXXLSNRngvgcoBtZIjX", best_score = 2)    
-    session.add(u0)
-    session.commit()
+    db.add(u0)
+    db.commit()
+
+
+def fill_database_auto():
+    db = SessionLocal()
+    q0= models.Questions(question_text = "Qu'est-ce qu'une API ?", position = 0)
+    db.add(q0)
+    db.commit()
+    db.refresh(q0)
+    r00= models.Choices(choice_text = "Un recette de cuisine" ,is_correct = False, question_id = q0.id)
+    r01= models.Choices(choice_text = "Un programme permettant à deux applications de communiquer entre elles." ,is_correct = True, question_id = q0.id)
+    r02= models.Choices(choice_text = "Une Application Pour les Italiens." ,is_correct = False, question_id = q0.id)
+    r03= models.Choices(choice_text = "Je sais pas ça sert a rien." ,is_correct = False, question_id = q0.id)
+    db.add(r00)
+    db.add(r01)
+    db.add(r02)
+    db.add(r03)
+    db.commit()
+    q1= models.Questions(question_text = "A quoi sert Docker ?", position = 1)
+    db.add(q1)
+    db.commit()
+    db.refresh(q1)
+    r10= models.Choices(choice_text = "A rien." ,is_correct = False, question_id = q1.id)
+    r11= models.Choices(choice_text = "Au départ ou à l'arrivée des bateaux c'est lui qui s'occupe de charger ou décharger les cargaisons." ,is_correct = False, question_id = q1.id)
+    r12= models.Choices(choice_text = "Développer des applications faciles à assembler, à maintenir et à déplacer." ,is_correct = True, question_id = q1.id)
+    r13= models.Choices(choice_text = "A programmer." ,is_correct = False, question_id = q1.id)
+    db.add(r10)
+    db.add(r11)
+    db.add(r12)
+    db.add(r13)
+    db.commit()
+    q2= models.Questions(question_text = "C'est quoi le principe CRUD ?", position = 2)
+    db.add(q2)
+    db.commit()
+    db.refresh(q2)
+    r20= models.Choices(choice_text = "Create, Read, Update, Delete." ,is_correct = True, question_id = q2.id)
+    r21= models.Choices(choice_text = "Ne pas cuire un aliment." ,is_correct = False, question_id = q2.id)
+    r22= models.Choices(choice_text = "A rien on s'en fiche." ,is_correct = False, question_id = q2.id)
+    r23= models.Choices(choice_text = "Manger plein de crudités." ,is_correct = False, question_id = q2.id)
+    db.add(r20)
+    db.add(r21)
+    db.add(r22)
+    db.add(r23)
+    db.commit()
+    u0 = models.Users(username = "mercierj", clerk_id = "user_2YX6QAdQGXXLSNRngvgcoBtZIjX", best_score = 2)    
+    db.add(u0)
+    db.commit()
+
 
 def is_table_empty():
     session = SessionLocal()
@@ -96,11 +136,22 @@ def is_table_empty():
     finally:
         session.close()
 
+
 @app.on_event("startup")
 async def startup_event():
     if is_table_empty():
-        fill_database()  
-        
+        try:
+            fill_database_chatgpt()
+            print("La base de donnée est remplie par ChatGPT")
+        except Exception as chatgpt_error:
+            print(f"Erreur lors du remplissage avec fill_database_chatgpt : {chatgpt_error}")
+            print("Tentative de remplissage avec fill_database_auto()")
+            try:
+                fill_database_auto()
+                print("La base de donnée est remplie automatiquement")
+            except Exception as auto_error:
+                print(f"Erreur lors du remplissage avec fill_database_auto : {auto_error}")
+                print("Aucune méthode de remplissage de la base de données n'a réussi.")
     else:
         print("La table n'est pas vide au démarrage.")
 
@@ -109,10 +160,7 @@ async def startup_event():
 async def quiz_infos(db: db_dependency):
     size = db.query(models.Questions).count()
     scores = db.query(models.Users).order_by(models.Users.best_score.desc()).limit(5).all()
-    
-    # Convertissez les résultats en dictionnaires si nécessaire
     scores_data = [{"username": user.username, "score": user.best_score} for user in scores]
-    
     return {"size": size, "scores": scores_data}
 
 
@@ -148,15 +196,12 @@ async def add_participation(db: db_dependency, request: Request):
     # Vérifiez si l'utilisateur existe déjà
     user_record = db.query(models.Users).filter(models.Users.clerk_id == user_id).first()
     if user_record is None:
-        # L'utilisateur n'existe pas, créez-le
         new_user = models.Users(clerk_id=user_id, best_score=score, username = user_name)
         db.add(new_user)
         db.commit()
     elif score > user_record.best_score:
-        # Mettez à jour le score si le score de la participation est supérieur
         user_record.best_score = score
         db.commit()
-    # Enregistrez la participation du joueur dans la base de données
     participation = models.Participation(score=score, clerk_id = user_id)
     db.add(participation)
     db.commit()

@@ -21,10 +21,18 @@ Pour démarrer les conteneurs s'ils ont déjà été créés, il faudra exécute
 
 Pour voir le dashboard, il faut aller sur votre navigateur et mettre `http://localhost:3000/`. 
 
+### ! ATTENTION !
+Au démarrage de l'application, il faudra attendre 1 à 2 minutes avant d'accéder a l'intérface utilisateur. Nous faisons appel à ChatGpt afin de remplir la base de donnée. Il faut donc attendre qu'il renvoit une réponse afin que la base de donnée soit remplie. Sinon, l'application n'affichera aucune question et aucun utilisateur dans le tableau des scores.
+
 
 ### Les données utilisées
 
-Les données que nous utilisons proviennent soit d'une injection initiale lors du démarrage de l'application dans la base de données, soit de données générées par les utilisateurs. Lorsque l'application démarre, nous vérifions si la base de données est vide, auquel cas nous la peuplons avec des questions et leurs réponses correspondantes. Nous ajoutons également un utilisateur avec son score pour simuler une participation antérieure à celle de l'utilisateur.
+Les données que nous utilisons proviennent de deux sources principales : soit d'une injection initiale lors du lancement de l'application dans la base de données, soit de données générées par les utilisateurs. Lorsque l'application démarre, nous effectuons une vérification pour déterminer si la base de données est vide. Si tel est le cas, nous la peuplons en générant des questions et leurs réponses correspondantes à l'aide de l'API OpenAI. Cette API agit comme un prompt de ChatGPT, nous permettant de demander directement la génération d'informations dans un format .json, en se basant sur des thèmes spécifiques tels que l'API, Docker et HTML dans notre contexte.
+
+Si la réponse de l'API ne correspond pas au format souhaité, en raison de la variabilité des prompts de ChatGPT, nous avons mis en place une procédure manuelle. Dans ce cas, nous remplissons la base de données avec des questions et des choix définis par nous-mêmes. Cela garantit le bon fonctionnement de l'application même si la réponse de l'API n'est pas conforme à nos attentes, ou si le compte OpenAI n'a plus de crédits. 
+Il est important de noter que ChatGPT n'est pas fiable à 100%. Il pourra générer les bonnes réponses comme la première option dans la liste des choix, malgrè nos demandes de la mettre au hasard. Il peut également attribuer la réponse correcte à une option incorrecte.
+
+En plus de cela, nous introduisons également un utilisateur avec un score pour simuler une participation antérieure à celle de l'utilisateur actuel, renforçant ainsi la richesse des données dans notre système.
 
 Concernant les données générées par les utilisateurs, elles comprennent le score obtenu au quiz ainsi que l'utilisateur lui-même, que nous ajoutons à la base de données s'il n'est pas déjà présent. À chaque participation au quiz, nous mettons à jour son meilleur score s'il dépasse le score précédent.
 
@@ -84,7 +92,7 @@ Le fichier HTML définit la structure et le contenu de la page web, le fichier C
 
 
 Le back sert à :
-- définition des requêtes FastApi et remplissage de la bdd : `main.py`
+- définition des requêtes FastApi, appel a l'API OpenAI et remplissage de la bdd : `main.py`
 - initialisation de la bdd : `database.py`
 - définition du model de donnée : `models.py`
 - les requirements pour ce conteneur : `requirements.txt`

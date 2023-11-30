@@ -16,13 +16,13 @@ Ensuite, il faut cloner le repository dans le dossier local souhaité en utilisa
 
 Le code s'organise en plusieurs conteneurs, permettant de gérer des fonctionnalités différentes. Il vous faudra donc vérifier que vous avez bien installé Docker.
 
-Une fois le repository cloné sur votre machine, il faudra exécuter la commande `docker compose up -d` à la racine du projet. Cela va construire les conteneurs nécessaires au fonctionnement de l'application ainsi que les démarrer s'ils n'ont pas déjà été créés auparavant. 
+Une fois le repository cloné sur votre machine, il faudra exécuter la commande `docker compose up -d` à la racine du projet. Cela va construire les conteneurs nécessaires au fonctionnement de l'application ainsi que les démarrer.
 Pour démarrer les conteneurs s'ils ont déjà été créés, il faudra exécuter la même commande.
 
-Pour voir le dashboard, il faut aller sur votre navigateur et mettre `http://localhost:3000/`. 
+Pour accéder à l'application, il faut aller sur votre navigateur et mettre `http://localhost:3000/`. 
 
 ### ! ATTENTION !
-Au démarrage de l'application, il faudra attendre 1 à 2 minutes avant d'accéder a l'intérface utilisateur. Nous faisons appel à ChatGpt afin de remplir la base de donnée. Il faut donc attendre qu'il renvoit une réponse afin que la base de donnée soit remplie. Sinon, l'application n'affichera aucune question et aucun utilisateur dans le tableau des scores.
+Au démarrage de l'application, il faudra attendre environ 1 minute avant d'accéder à l'intérface utilisateur. Nous faisons appel à l'API OpenAI afin de remplir la base de donnée. Il faut donc attendre qu'il renvoit une réponse afin que la base de donnée soit remplie. Sinon, l'application n'affichera aucune question et aucun utilisateur dans le tableau des scores.
 
 
 ### Les données utilisées
@@ -32,13 +32,21 @@ Les données que nous utilisons proviennent de deux sources principales : soit d
 Si la réponse de l'API ne correspond pas au format souhaité, en raison de la variabilité des prompts de ChatGPT, nous avons mis en place une procédure manuelle. Dans ce cas, nous remplissons la base de données avec des questions et des choix définis par nous-mêmes. Cela garantit le bon fonctionnement de l'application même si la réponse de l'API n'est pas conforme à nos attentes, ou si le compte OpenAI n'a plus de crédits. 
 Il est important de noter que ChatGPT n'est pas fiable à 100%. Il pourra générer les bonnes réponses comme la première option dans la liste des choix, malgrè nos demandes de la mettre au hasard. Il peut également attribuer la réponse correcte à une option incorrecte.
 
-En plus de cela, nous introduisons également un utilisateur avec un score pour simuler une participation antérieure à celle de l'utilisateur actuel, renforçant ainsi la richesse des données dans notre système.
+Nous introduisons également un utilisateur avec un score pour simuler une participation antérieure à celle de l'utilisateur actuel, renforçant ainsi la richesse des données dans notre système.
 
 Concernant les données générées par les utilisateurs, elles comprennent le score obtenu au quiz ainsi que l'utilisateur lui-même, que nous ajoutons à la base de données s'il n'est pas déjà présent. À chaque participation au quiz, nous mettons à jour son meilleur score s'il dépasse le score précédent.
 
 ### Les paquets à utiliser
 
 Des paquets sont nécessaires pour le bon fonctionnement du projet, ils sont dans les fichiers requirements.txt, et sont automatiquement installés dans les conteneurs correspondants lors de leur création.
+
+### Outils utilisés
+Authentification : Clerk
+Base de donnée : PosgreSQL
+Langages : Python, CSS, HTML, Javascript
+Conteneurisation : Docker
+Requêtes API : FastAPI
+Remplissage de la BDD : OpenAI API / remplissage auto si on n'arrive pas a décoder la réponse
 
 
 ### Fonctionnement du projet

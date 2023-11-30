@@ -16,7 +16,20 @@
   <body>
     <nav id="navbar"></nav>
     
-    <h2>Quiz</h2>
+    <h2 id="quizTitle">Quiz</h2>
+
+<script>
+    async function fetchFillType() {
+        try {
+            const response = await fetch('http://localhost:8000/remplissage');
+            const data = await response.json();
+            document.getElementById('quizTitle').innerText = `Quiz - ${data.type_remplissage}`;
+        } catch (error) {
+            console.error('Erreur lors de la récupération des données de l\'API', error);
+        }
+    }
+    window.onload = fetchFillType;
+</script>
 
     <div id="question-container"></div>
     <div id="choices-list-div"></div><ul id="choices-list"></ul></div>

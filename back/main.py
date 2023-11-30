@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, status, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List
 from typing_extensions import Annotated
@@ -53,10 +54,10 @@ def generate_question_and_choices():
         model="gpt-3.5-turbo",
         messages=prompt)
     out = response.choices[0].message.content
-    print(response.choices[0].message.content)
     index_accolade = out.find('{')
     if index_accolade != -1:
         reponse = out[index_accolade:]
+    print(reponse)
     return json.loads(reponse)
 
 
@@ -136,6 +137,8 @@ def is_table_empty():
     finally:
         session.close()
 
+class StartupInfo:
+    type_remplissage = None
 
 @app.on_event("startup")
 async def startup_event():
@@ -143,17 +146,23 @@ async def startup_event():
         try:
             fill_database_chatgpt()
             print("La base de donnée est remplie par ChatGPT")
+            StartupInfo.type_remplissage = "ChatGPT"
         except Exception as chatgpt_error:
             print(f"Erreur lors du remplissage avec fill_database_chatgpt : {chatgpt_error}")
             print("Tentative de remplissage avec fill_database_auto()")
             try:
                 fill_database_auto()
                 print("La base de donnée est remplie automatiquement")
+                StartupInfo.type_remplissage = "Auto"
             except Exception as auto_error:
                 print(f"Erreur lors du remplissage avec fill_database_auto : {auto_error}")
                 print("Aucune méthode de remplissage de la base de données n'a réussi.")
     else:
         print("La table n'est pas vide au démarrage.")
+
+@app.get("/remplissage")
+async def remplissage():
+    return JSONResponse(content={"type_remplissage": StartupInfo.type_remplissage})
 
 
 @app.get("/quiz_infos")

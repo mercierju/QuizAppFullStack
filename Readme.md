@@ -22,7 +22,7 @@ Pour démarrer les conteneurs s'ils ont déjà été créés, il faudra exécute
 Pour accéder à l'application, il faut aller sur votre navigateur et mettre `http://localhost:3000/`. 
 
 ### ! ATTENTION !
-Au démarrage de l'application, il faudra attendre environ 1 minute avant d'accéder à l'intérface utilisateur. Nous faisons appel à l'API OpenAI afin de remplir la base de donnée. Il faut donc attendre qu'il renvoit une réponse afin que la base de donnée soit remplie. Sinon, l'application n'affichera aucune question et aucun utilisateur dans le tableau des scores.
+Au démarrage de l'application, il faudra attendre environ 1 minute avant d'accéder à l'intérface utilisateur. Nous faisons appel à l'API OpenAI afin de remplir la base de donnée. Il faut donc attendre qu'il renvoie une réponse afin que la base de donnée soit remplie. Sinon, l'application n'affichera aucune question et aucun utilisateur dans le tableau des scores.
 
 
 ### Les données utilisées
@@ -30,7 +30,7 @@ Au démarrage de l'application, il faudra attendre environ 1 minute avant d'acc�
 Les données que nous utilisons proviennent de deux sources principales : soit d'une injection initiale lors du lancement de l'application dans la base de données, soit de données générées par les utilisateurs. Lorsque l'application démarre, nous effectuons une vérification pour déterminer si la base de données est vide. Si tel est le cas, nous la peuplons en générant des questions et leurs réponses correspondantes à l'aide de l'API OpenAI. Cette API agit comme un prompt de ChatGPT, nous permettant de demander directement la génération d'informations dans un format .json, en se basant sur des thèmes spécifiques tels que l'API, Docker et HTML dans notre contexte.
 
 Si la réponse de l'API ne correspond pas au format souhaité, en raison de la variabilité des prompts de ChatGPT, nous avons mis en place une procédure manuelle. Dans ce cas, nous remplissons la base de données avec des questions et des choix définis par nous-mêmes. Cela garantit le bon fonctionnement de l'application même si la réponse de l'API n'est pas conforme à nos attentes, ou si le compte OpenAI n'a plus de crédits. 
-Il est important de noter que ChatGPT n'est pas fiable à 100%. Il pourra générer les bonnes réponses comme la première option dans la liste des choix, malgrè nos demandes de la mettre au hasard. Il peut également attribuer la réponse correcte à une option incorrecte.
+Il est important de noter que ChatGPT n'est pas fiable à 100%. Il pourra générer les bonnes réponses comme la première option dans la liste des choix, malgré nos demandes de la mettre au hasard. Il peut également attribuer la réponse correcte à une option incorrecte.
 
 Nous introduisons également un utilisateur avec un score pour simuler une participation antérieure à celle de l'utilisateur actuel, renforçant ainsi la richesse des données dans notre système.
 
@@ -42,11 +42,11 @@ Des paquets sont nécessaires pour le bon fonctionnement du projet, ils sont dan
 
 ### Outils utilisés
 Authentification : Clerk
-Base de donnée : PosgreSQL
+Base de donnée : PostgreSQL
 Langages : Python, CSS, HTML, Javascript
 Conteneurisation : Docker
 Requêtes API : FastAPI
-Remplissage de la BDD : OpenAI API / remplissage auto si on n'arrive pas a décoder la réponse
+Remplissage de la BDD : OpenAI API / remplissage auto si on n'arrive pas à décoder la réponse
 
 
 ### Fonctionnement du projet
@@ -67,7 +67,7 @@ Une fois la base de données complétée, le tableau des scores peut être affic
 Nous avons initialement tenté d'utiliser un webhook de Clerk pour ajouter automatiquement les utilisateurs à la base de données PostgreSQL dès leur création sur Clerk. Cependant, face à plusieurs échecs, nous avons opté pour une approche différente. Nous récupérons les données de l'utilisateur de la session en cours, et si cet utilisateur envoie une participation alors qu'il n'est pas encore dans la base de données, nous l'ajoutons. S'il existe déjà, nous vérifions simplement si son nouveau score est supérieur à celui enregistré précédemment.
 
 
-## Model de données 
+## Modèles de données 
 
 - Users : Contient les informations relatives aux utilisateurs.
 Colonnes : id, username, clerk_id, best_score.
@@ -78,16 +78,16 @@ Colonnes : id, question_text, position (indiquant la position de la question dan
 - Choices : Stocke les différentes options de réponse associées à chaque question du QCM.
 Colonnes : id, choice_text, is_correct, question_id (permettant de lier le choix à la question correspondante).
 
-- Participation :Rassemble les résultats du QCM réalisé par les utilisateurs.
+- Participation : Rassemble les résultats du QCM réalisé par les utilisateurs.
 Colonnes : id, clerk_id (identifiant l'utilisateur), score.
 
 ## Quide développeur
 
 Le projet est divisé en 3 conteneurs : le front, le back, et la base de données.
 
-La base de données PosgreSQL nous servira à stocker les données.
+La base de données PostgreSQL nous servira à stocker les données.
 
-Le front sert à afficher les données et a rendre l'application agréable a utiliser :
+Le front sert à afficher les données et à rendre l'application agréable à utiliser :
 - page d'accueil : `index.js` et `index.html`
 - authentification des utilisateurs avec Clerk : `clerk-auth.js` et `clerk-auth.html`
 - page du quiz : `quiz.js` et `quiz.html`
@@ -100,11 +100,11 @@ Le fichier HTML définit la structure et le contenu de la page web, le fichier C
 
 
 Le back sert à :
-- définition des requêtes FastApi, appel a l'API OpenAI et remplissage de la bdd : `main.py`
+- définition des requêtes FastApi, appel à l'API OpenAI et remplissage de la bdd : `main.py`
 - initialisation de la bdd : `database.py`
 - définition du model de donnée : `models.py`
 - les requirements pour ce conteneur : `requirements.txt`
 - le Dockerfile de ce container : `Dockerfile`
 
-La configuration permettant d'initialiser et de lancer le projet est stockée dans le fichier : `docker-compose.yml` se situant a la racine du projet.
+La configuration permettant d'initialiser et de lancer le projet est stockée dans le fichier : `docker-compose.yml` se situant à la racine du projet.
 

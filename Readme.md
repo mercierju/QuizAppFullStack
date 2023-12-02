@@ -1,5 +1,8 @@
 # Quiz
 
+### ! ATTENTION !
+Nous utilisons l'API OpenAI dans ce projet. Afin de garantir le bon fonctionnement de l'application, il est impératif d'intégrer notre clé API. Vous devrez l'ajouter dans le fichier `.env.exemple`, en supprimant l'extension ".exemple". En raison de sa nature confidentielle, cette clé ne doit en aucun cas être partagée publiquement, sous peine de désactivation automatique. Si nécessaire, veuillez nous en faire la demande par e-mail. Nous vous remercions de votre compréhension.
+
 ## Description du projet
 
 Vous voulez réviser pour préparer votre QCM dans la matière Full Stack Application ? Cette application est faite pour vous !!

@@ -140,6 +140,14 @@ def is_table_empty():
 class StartupInfo:
     type_remplissage = None
 
+
+@app.get("/table_empty_status")
+def get_table_empty_status():
+    return {"is_empty": TableEmpty.is_empty}
+
+class TableEmpty:
+    is_empty = True
+
 @app.on_event("startup")
 async def startup_event():
     if is_table_empty():
@@ -147,6 +155,7 @@ async def startup_event():
             fill_database_chatgpt()
             print("La base de donnée est remplie par ChatGPT")
             StartupInfo.type_remplissage = "ChatGPT"
+            TableEmpty.is_empty = False
         except Exception as chatgpt_error:
             print(f"Erreur lors du remplissage avec fill_database_chatgpt : {chatgpt_error}")
             print("Tentative de remplissage avec fill_database_auto()")
@@ -154,6 +163,7 @@ async def startup_event():
                 fill_database_auto()
                 print("La base de donnée est remplie automatiquement")
                 StartupInfo.type_remplissage = "Auto"
+                TableEmpty.is_empty = False
             except Exception as auto_error:
                 print(f"Erreur lors du remplissage avec fill_database_auto : {auto_error}")
                 print("Aucune méthode de remplissage de la base de données n'a réussi.")

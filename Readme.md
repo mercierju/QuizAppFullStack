@@ -1,5 +1,8 @@
 # Quiz
 
+### ! ATTENTION !
+Nous utilisons l'API OpenAI dans ce projet. Afin de garantir le bon fonctionnement de l'application, il est impératif d'intégrer notre clé API. Vous devrez l'ajouter dans le fichier `.env.exemple`, en supprimant l'extension ".exemple". En raison de sa nature confidentielle, cette clé ne doit en aucun cas être partagée publiquement, sous peine de désactivation automatique. Si nécessaire, veuillez nous en faire la demande par e-mail. Nous vous remercions de votre compréhension.
+
 ## Description du projet
 
 Vous voulez réviser pour préparer votre QCM dans la matière Full Stack Application ? Cette application est faite pour vous !!
@@ -22,8 +25,7 @@ Pour démarrer les conteneurs s'ils ont déjà été créés, il faudra exécute
 Pour accéder à l'application, il faut aller sur votre navigateur et mettre `http://localhost:3000/`. 
 
 ### ! ATTENTION !
-Au démarrage de l'application, il faudra attendre environ 1 minute avant d'accéder à l'intérface utilisateur. Nous faisons appel à l'API OpenAI afin de remplir la base de donnée. Il faut donc attendre qu'il renvoie une réponse afin que la base de donnée soit remplie. Sinon, l'application n'affichera aucune question et aucun utilisateur dans le tableau des scores.
-
+Au premier démarrage de l'application, un écran de chargement apparaîtra pendant environ une minute, et vous ne pourrez pas démarrer le quiz. Nous utilisons l'API OpenAI pour peupler la base de données, il est donc nécessaire d'attendre sa réponse pour que la base de données soit complétée. Pendant cette opération, un écran de chargement est affiché, qui laisse place à la page d'accueil une fois la base de données remplie.
 
 ### Les données utilisées
 
@@ -42,7 +44,7 @@ Des paquets sont nécessaires pour le bon fonctionnement du projet, ils sont dan
 
 ### Outils utilisés
 Authentification : Clerk
-Base de donnée : PostgreSQL
+Base de données : PostgreSQL
 Langages : Python, CSS, HTML, Javascript
 Conteneurisation : Docker
 Requêtes API : FastAPI
@@ -60,7 +62,7 @@ Le projet se compose de trois éléments principaux :
 
 Mais concrètement, comment ça marche ?
 
-Lorsque notre application est lancée pour la première fois, nous procédons à l'ajout des données nécessaires au fonctionnement, telles que des questions/réponses et un utilisateur de test, dans la base de données. Ces opérations sont effectuées côté back-end.
+Lorsque notre application est lancée pour la première fois, nous procédons à l'ajout des données nécessaires au fonctionnement, telles que des questions/réponses et un utilisateur de test, dans la base de données. Ces opérations sont effectuées côté back-end. Pendant le remplissage de la base de données, nous affichons un écran de chargement sur la page d'accueil qui disparait une fois que le chargement a été effectué.
 
 Une fois la base de données complétée, le tableau des scores peut être affiché sur la page d'accueil, bien que pour l'instant il ne comporte qu'un seul utilisateur. Lorsqu'un utilisateur clique sur le bouton "Commencer le quiz", deux scénarios se présentent : soit il est déjà authentifié sur l'application et est redirigé vers le quiz, soit il ne l'est pas et doit d'abord s'authentifier. La gestion des utilisateurs revêt ici une importance cruciale, permettant d'attribuer des participations à des utilisateurs spécifiques et de maintenir un classement des meilleurs scores pour chaque utilisateur. L'authentification est gérée de manière externe par Clerk, simplifiant le processus avec une seule authentification.
 
@@ -81,7 +83,7 @@ Colonnes : id, choice_text, is_correct, question_id (permettant de lier le choix
 - Participation : Rassemble les résultats du QCM réalisé par les utilisateurs.
 Colonnes : id, clerk_id (identifiant l'utilisateur), score.
 
-## Quide développeur
+## Guide développeur
 
 Le projet est divisé en 3 conteneurs : le front, le back, et la base de données.
 
@@ -102,7 +104,7 @@ Le fichier HTML définit la structure et le contenu de la page web, le fichier C
 Le back sert à :
 - définition des requêtes FastApi, appel à l'API OpenAI et remplissage de la bdd : `main.py`
 - initialisation de la bdd : `database.py`
-- définition du model de donnée : `models.py`
+- définition du model de données : `models.py`
 - les requirements pour ce conteneur : `requirements.txt`
 - le Dockerfile de ce container : `Dockerfile`
 

@@ -1,13 +1,13 @@
 let currentQuestion = 0;
 let userAnswers = [];
 
-// Fonction pour afficher la question actuelle
+// Affichage de la question actuelle
 function displayQuestion(questionData) {
   const questionContainer = document.getElementById("question-container");
   const questionText = questionData[0]["question_text"];
   const questionType = document.getElementById("quiz-title");
   const isChatGpt = questionData[0]["is_chatgpt"];
-
+  // Affichage de la source de la question (ChatGPT ou Auto)
   questionType.textContent = "Quiz - " + (isChatGpt ? "ChatGPT" : "Auto");
   questionContainer.textContent = questionText;
 
@@ -29,7 +29,7 @@ fetch("http://localhost:8000/quiz_infos")
   .then((data) => {
     totalQuestions = data.size;
 
-    // Charger la première question depuis le backend
+    // Chargement de la première question depuis le backend
     fetch(`http://localhost:8000/questions/${currentQuestion}`)
       .then((response) => response.json())
       .then((data) => {
@@ -37,7 +37,7 @@ fetch("http://localhost:8000/quiz_infos")
       });
   });
 
-// Gérer le clic sur le bouton "Valider mes réponses"
+// Clic sur le bouton "Valider mes réponses"
 const submitButton = document.getElementById("submit-button");
 submitButton.addEventListener("click", () => {
   const selectedChoice = document.querySelector('input[name="choice"]:checked');
@@ -45,14 +45,14 @@ submitButton.addEventListener("click", () => {
     userAnswers.push(parseInt(selectedChoice.value));
     currentQuestion++;
     if (currentQuestion < totalQuestions) {
-      // Charger la question suivante depuis le backend
+      // Chargement de la question suivante depuis le backend
       fetch(`http://localhost:8000/questions/${currentQuestion}`)
         .then((response) => response.json())
         .then((data) => {
           displayQuestion(data);
         });
     } else {
-      // Envoyer les réponses au backend et rediriger vers la page des résultats
+      // Envoi les réponses au backend et rediriger vers la page des résultats
       fetch("http://localhost:8000/participation", {
         method: "POST",
         headers: {
@@ -66,7 +66,7 @@ submitButton.addEventListener("click", () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          // Rediriger vers la page des résultats avec les données
+          // Redirection vers la page des résultats avec les données
           window.location.href = `results.html?score=${data.score}`;
         });
     }

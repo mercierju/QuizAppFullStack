@@ -18,11 +18,11 @@ const startClerk = async () => {
 
     Clerk.addListener(({ user }) => {
       if (user) {
-        // L'utilisateur est connecté, vous pouvez accéder à son identifiant
+        // Récupération des informations de l'utilisateur s'il est connecté
         globalUserId = user.id;
         globalUserName = user.username;
 
-        // Montez le bouton utilisateur avec l'ID utilisateur s'il existe
+        // Bouton utilisateur avec l'ID utilisateur s'il existe
         if (userButton) {
           Clerk.mountUserButton(userButton, {
             appearance: {
@@ -41,7 +41,6 @@ const startClerk = async () => {
   }
 };
 
-// Charger Clerk sur toutes les pages
 (() => {
   const script = document.createElement("script");
   script.setAttribute("data-clerk-publishable-key", publishableKey);

@@ -13,10 +13,12 @@ import json
 from dotenv import load_dotenv
 import os
 
+# Accès a la clé api ChatGPT
 load_dotenv()
 openai_key = os.getenv("OPENAI_API_KEY")
 client = openai.OpenAI(api_key=openai_key)
 
+# Création de l'application FastApi
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
@@ -47,7 +49,7 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 
-
+# Génération des questions par ChatGPT
 def generate_question_and_choices():
     prompt = [{'role': 'user', 'content' : "Je veux un résultat comme celui-ci mais pour plusieurs questions au format json : 'questions' : [{'theme': 'API', 'question_text': 'Qu'est-ce que signifie l'acronyme API?', 'choices': [ {'choice_text': 'a) Application Programming Interface', 'is_correct': true}, {'choice_text': 'b) Advanced Programming Interface', 'is_correct': false}, {'choice_text': 'c) Automated Processing Interface', 'is_correct': false}, {'choice_text': 'd) Application Process Integration', 'is_correct': false} ] }], Génère une question pour chacun de ces thèmes ('API','Docker', 'HTML') avec pour chaque question 4 choix possibles et une valeur True ou False en fonction de si le choix est le bon, je veux la réponse true placée au hasard. Je veux que tout soit en français. Répond juste avec le json sans aucun texte."}]
     response = client.chat.completions.create(
@@ -61,7 +63,7 @@ def generate_question_and_choices():
     return json.loads(reponse)
 
 
-# Remplissage de la base de données
+# Remplissage de la base de données avec les données de ChatGPT
 def fill_database_chatgpt():
     db = SessionLocal()
     data = generate_question_and_choices()
@@ -83,6 +85,8 @@ def fill_database_chatgpt():
     db.commit()
 
 
+# Remplissage de la base de données avec des questions définies si nous n'arrivons pas a déchiffrer la réponse
+# de ChatGPT
 def fill_database_auto():
     db = SessionLocal()
     q0= models.Questions(question_text = "Qu'est-ce qu'une API ?", position = 0, is_chatgpt = False)
@@ -128,7 +132,7 @@ def fill_database_auto():
     db.add(u0)
     db.commit()
 
-
+# Verification de l'état de la base de donnée
 def is_table_empty():
     session = SessionLocal()
     try:
@@ -137,29 +141,26 @@ def is_table_empty():
     finally:
         session.close()
 
-class StartupInfo:
-    type_remplissage = None
-
+# Remplissage de la base de données au démarrage de l'application si elle est vide
 @app.on_event("startup")
 async def startup_event():
     if is_table_empty():
         try:
             fill_database_chatgpt()
-            print("La base de donnée est remplie par ChatGPT")
-            StartupInfo.type_remplissage = "ChatGPT"
+            print("La base de données est remplie par ChatGPT")
         except Exception as chatgpt_error:
             print(f"Erreur lors du remplissage avec fill_database_chatgpt : {chatgpt_error}")
             print("Tentative de remplissage avec fill_database_auto()")
             try:
                 fill_database_auto()
-                print("La base de donnée est remplie automatiquement")
-                StartupInfo.type_remplissage = "Auto"
+                print("La base de données est remplie automatiquement")
             except Exception as auto_error:
                 print(f"Erreur lors du remplissage avec fill_database_auto : {auto_error}")
                 print("Aucune méthode de remplissage de la base de données n'a réussi.")
     else:
         print("La table n'est pas vide au démarrage.")
 
+# Récupération des informations du quiz
 @app.get("/quiz_infos")
 async def quiz_infos(db: db_dependency):
     size = db.query(models.Questions).count()
@@ -167,7 +168,7 @@ async def quiz_infos(db: db_dependency):
     scores_data = [{"username": user.username, "score": user.best_score} for user in scores]
     return {"size": size, "scores": scores_data}
 
-
+# Récupération d'une question en fonction de sa position dans le quiz
 @app.get('/questions/{position}')
 async def get_question(position: int, db : db_dependency):
     question = db.query(models.Questions).filter(models.Questions.position == position).first()
@@ -176,7 +177,7 @@ async def get_question(position: int, db : db_dependency):
     answers =db.query(models.Choices).filter(models.Choices.question_id == question.id).all()
     return question, answers
 
-
+# Ajout d'une participation au quiz d'un utilisateur dans la base de données
 @app.post('/participation')
 async def add_participation(db: db_dependency, request: Request):
     print(f"Received request data: {await request.body()}")

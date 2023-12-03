@@ -25,9 +25,18 @@ body {
   color: white;
 }
 
-button {
-  display: block;
-  margin: 0 auto;
+.h-center {
+  display: flex;
+  justify-content: center;
+}
+
+.auth-buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.rm-underline {
+  text-decoration: none;
 }
 
 #choices-list-div {

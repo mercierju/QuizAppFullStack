@@ -7,6 +7,7 @@ class Questions(Base):
     id = Column(Integer, primary_key=True, index = True)
     question_text = Column(String, index = True)
     position = Column(Integer, index = True)
+    is_chatgpt = Column(Boolean, index = True )
 
 class Choices(Base):
     __tablename__ = "Choix"

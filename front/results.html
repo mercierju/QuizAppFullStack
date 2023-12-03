@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Quiz App - Résultats</title>
 
     <link rel="stylesheet" href="global.css" type="text/css" />
@@ -21,6 +21,33 @@
     <div id="result-message"></div>
     <div id="score"></div>
 
+    <div class="h-center" id="result-animation">
+      <lottie-player
+        src="thumb-up.json"
+        background="transparent"
+        speed="0.75"
+        style="width: 300px; height: 300px"
+        direction="1"
+        mode="bounce"
+        loop
+        autoplay
+        class="hide"
+        id="thumb-up"
+      ></lottie-player>
+      <lottie-player
+        src="wip.json"
+        background="transparent"
+        speed="0.75"
+        style="width: 300px; height: 300px"
+        direction="1"
+        mode="bounce"
+        loop
+        autoplay
+        class="hide"
+        id="wip"
+      ></lottie-player>
+    </div>
+
     <button id="back-to-home-button" class="button">Retour à l'accueil</button>
 
     <script src="results.js"></script>
@@ -29,5 +56,6 @@
         $("#navbar").load("navbar.html");
       });
     </script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
   </body>
 </html>

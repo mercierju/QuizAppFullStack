@@ -25,7 +25,7 @@ function fetchQuizInfos() {
 }
 
 fetchQuizInfos();
-const loadingInterval = setInterval(fetchQuizInfos, 10000);
+const loadingInterval = setInterval(fetchQuizInfos, 5000);
 
 const startQuizButton = document.getElementById("start-quiz-button");
 startQuizButton.addEventListener("click", async () => {

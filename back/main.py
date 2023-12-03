@@ -67,7 +67,7 @@ def fill_database_chatgpt():
     data = generate_question_and_choices()
     position = 0
     for question_data in data["questions"]:
-        question = models.Questions(question_text=question_data["question_text"], position=position)
+        question = models.Questions(question_text=question_data["question_text"], position=position, is_chatgpt = True)
         db.add(question)
         db.flush() 
         position+=1
@@ -85,7 +85,7 @@ def fill_database_chatgpt():
 
 def fill_database_auto():
     db = SessionLocal()
-    q0= models.Questions(question_text = "Qu'est-ce qu'une API ?", position = 0)
+    q0= models.Questions(question_text = "Qu'est-ce qu'une API ?", position = 0, is_chatgpt = False)
     db.add(q0)
     db.commit()
     db.refresh(q0)
@@ -98,7 +98,7 @@ def fill_database_auto():
     db.add(r02)
     db.add(r03)
     db.commit()
-    q1= models.Questions(question_text = "A quoi sert Docker ?", position = 1)
+    q1= models.Questions(question_text = "A quoi sert Docker ?", position = 1, is_chatgpt = False)
     db.add(q1)
     db.commit()
     db.refresh(q1)
@@ -111,7 +111,7 @@ def fill_database_auto():
     db.add(r12)
     db.add(r13)
     db.commit()
-    q2= models.Questions(question_text = "C'est quoi le principe CRUD ?", position = 2)
+    q2= models.Questions(question_text = "C'est quoi le principe CRUD ?", position = 2, is_chatgpt = False)
     db.add(q2)
     db.commit()
     db.refresh(q2)
@@ -159,11 +159,6 @@ async def startup_event():
                 print("Aucune méthode de remplissage de la base de données n'a réussi.")
     else:
         print("La table n'est pas vide au démarrage.")
-
-@app.get("/remplissage")
-async def remplissage():
-    return JSONResponse(content={"type_remplissage": StartupInfo.type_remplissage})
-
 
 @app.get("/quiz_infos")
 async def quiz_infos(db: db_dependency):

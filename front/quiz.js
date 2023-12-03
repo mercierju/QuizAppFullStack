@@ -5,7 +5,10 @@ let userAnswers = [];
 function displayQuestion(questionData) {
   const questionContainer = document.getElementById("question-container");
   const questionText = questionData[0]["question_text"];
+  const questionType = document.getElementById("quiz-title");
+  const isChatGpt = questionData[0]["is_chatgpt"];
 
+  questionType.textContent = "Quiz - " + (isChatGpt ? "ChatGPT" : "Auto");
   questionContainer.textContent = questionText;
 
   const choicesList = document.getElementById("choices-list");
@@ -67,5 +70,7 @@ submitButton.addEventListener("click", () => {
           window.location.href = `results.html?score=${data.score}`;
         });
     }
+  } else {
+    alert("Vous n'avez pas sélectionné de réponse !");
   }
 });

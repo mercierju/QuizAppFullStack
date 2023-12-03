@@ -14,15 +14,9 @@ const startClerk = async () => {
       afterSignUpUrl: "/quiz.html",
     });
 
-    const authLinks = document.getElementById("auth-links");
     const userButton = document.getElementById("user-button");
 
     Clerk.addListener(({ user }) => {
-      // Afficher les liens en fonction de l'état de l'utilisateur
-      if (authLinks) {
-        authLinks.style.display = user ? "none" : "block";
-      }
-
       if (user) {
         // L'utilisateur est connecté, vous pouvez accéder à son identifiant
         globalUserId = user.id;
@@ -33,7 +27,7 @@ const startClerk = async () => {
           Clerk.mountUserButton(userButton, {
             appearance: {
               elements: {
-                userButtonTrigger : { marginRight: 10},
+                userButtonTrigger: { marginRight: 10 },
                 avatarBox: { width: 50, height: 50 },
               },
             },

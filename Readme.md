@@ -1,7 +1,7 @@
 # Quiz
 
 ### ! ATTENTION !
-Nous utilisons l'API OpenAI dans ce projet. Afin de garantir le bon fonctionnement de l'application, il est impératif d'intégrer notre clé API. Vous devrez l'ajouter dans le fichier `.env.exemple`, en supprimant l'extension ".exemple". En raison de sa nature confidentielle, cette clé ne doit en aucun cas être partagée publiquement, sous peine de désactivation automatique. Si nécessaire, veuillez nous en faire la demande par e-mail. Nous vous remercions de votre compréhension.
+Nous utilisons l'API OpenAI dans ce projet. Afin de garantir le bon fonctionnement de l'application, il est impératif d'intégrer notre clé API. L'application sera fonctionnelle sans cette clé, mais les questions présentes dans la base de données seront des questions définies par nos soins et non pas générées par ChatGPT. Vous devrez ajouter la clé dans le fichier `.env.exemple`, en supprimant l'extension ".exemple". En raison de sa nature confidentielle, cette clé ne doit en aucun cas être partagée publiquement, sous peine de désactivation automatique. C'est pour cela que la clé n'est pas présente dans ce repository. Si nécessaire, veuillez nous en faire la demande par e-mail. Nous vous remercions de votre compréhension.
 
 ## Description du projet
 
